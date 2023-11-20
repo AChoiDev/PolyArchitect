@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 
 namespace PolyArchitect.Core {
-public enum PointSide {OUTSIDE, ALIGNED, INSIDE}
-public enum PolygonSide {OUTSIDE, ALIGNED, REVERSE_ALIGNED, INSIDE}
+    public enum PointSide { OUTSIDE, ALIGNED, INSIDE }
+    public enum PolygonSide { OUTSIDE, ALIGNED, REVERSE_ALIGNED, INSIDE }
 
-// TODO: rename this to polygon side utilities
-// also investigate just using integers only instead of enums
-public static class CategorizationUtilities {
-    public const int IN = 0; // inside
-    public const int ALN = 1; // aligned
-    public const int RA = 2; // reverse aligned
-    public const int OUT = 3; // outside
-    private readonly static Dictionary<(int, int), int> addLookup = new(){
+    // TODO: rename this to polygon side utilities
+    // also investigate just using integers only instead of enums
+    public static class CategorizationUtilities {
+        public const int IN = 0; // inside
+        public const int ALN = 1; // aligned
+        public const int RA = 2; // reverse aligned
+        public const int OUT = 3; // outside
+        private readonly static Dictionary<(int, int), int> addLookup = new(){
         // (a, b) => c
         { (IN, IN),     IN },
         { (IN, ALN),    IN },
@@ -34,7 +34,7 @@ public static class CategorizationUtilities {
         { (OUT, RA),    RA },
         { (OUT, OUT),   OUT },
     };
-    private readonly static Dictionary<(int, int), int> subtractLookup = new(){
+        private readonly static Dictionary<(int, int), int> subtractLookup = new(){
         // (a, b) => c
         { (IN, IN),     OUT },
         { (IN, ALN),    RA },
@@ -56,7 +56,7 @@ public static class CategorizationUtilities {
         { (OUT, RA),    OUT },
         { (OUT, OUT),   OUT },
     };
-    private readonly static Dictionary<(int, int), int> intersectLookup = new(){
+        private readonly static Dictionary<(int, int), int> intersectLookup = new(){
         // (a, b) => c
         { (IN, IN),     IN },
         { (IN, ALN),    ALN },
@@ -79,13 +79,13 @@ public static class CategorizationUtilities {
         { (OUT, OUT),   OUT },
     };
 
-    private readonly static Dictionary<PolygonSide, int> sideEnumToConstant = new(){
+        private readonly static Dictionary<PolygonSide, int> sideEnumToConstant = new(){
         {PolygonSide.ALIGNED, ALN},
         {PolygonSide.REVERSE_ALIGNED, RA},
         {PolygonSide.INSIDE, IN},
         {PolygonSide.OUTSIDE, OUT}
     };
-    private readonly static Dictionary<int, PolygonSide> constantToSideEnum = new(){
+        private readonly static Dictionary<int, PolygonSide> constantToSideEnum = new(){
         {ALN, PolygonSide.ALIGNED},
         {RA, PolygonSide.REVERSE_ALIGNED},
         {IN, PolygonSide.INSIDE},
@@ -93,19 +93,19 @@ public static class CategorizationUtilities {
     };
 
 
-    public static PolygonSide AddCategorize(PolygonSide lh, PolygonSide rh) {
-        var result = addLookup[(sideEnumToConstant[lh], sideEnumToConstant[rh])];
-        return constantToSideEnum[result];
-    }
+        public static PolygonSide AddCategorize(PolygonSide lh, PolygonSide rh) {
+            var result = addLookup[(sideEnumToConstant[lh], sideEnumToConstant[rh])];
+            return constantToSideEnum[result];
+        }
 
-    public static PolygonSide SubtractCategorize(PolygonSide lh, PolygonSide rh) {
-        var result = subtractLookup[(sideEnumToConstant[lh], sideEnumToConstant[rh])];
-        return constantToSideEnum[result];
-    }
+        public static PolygonSide SubtractCategorize(PolygonSide lh, PolygonSide rh) {
+            var result = subtractLookup[(sideEnumToConstant[lh], sideEnumToConstant[rh])];
+            return constantToSideEnum[result];
+        }
 
-    public static PolygonSide IntersectCategorize(PolygonSide lh, PolygonSide rh) {
-        var result = intersectLookup[(sideEnumToConstant[lh], sideEnumToConstant[rh])];
-        return constantToSideEnum[result];
+        public static PolygonSide IntersectCategorize(PolygonSide lh, PolygonSide rh) {
+            var result = intersectLookup[(sideEnumToConstant[lh], sideEnumToConstant[rh])];
+            return constantToSideEnum[result];
+        }
     }
-}
 }
