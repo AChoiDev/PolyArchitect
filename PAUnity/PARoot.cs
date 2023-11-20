@@ -1,12 +1,12 @@
+using System.Collections.Generic;
+using UnityEngine;
+using System.Linq;
 using PolyArchitect.Core;
 using PolyArchitect.Unity;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 // main unity driver for CSG Tree
 [ExecuteInEditMode()]
-public class PARoot : MonoBehaviour {
+public class PARoot : MonoBehaviour { 
 
     public class BrushRegistration {
         public Brush brush;
@@ -53,7 +53,7 @@ public class PARoot : MonoBehaviour {
         var brushIDsToRemove = brushRegistry.GetIDs().Where((brushID) => csgTreeBrushes.Contains(brushRegistry.Get(brushID).brush) == false).ToList();
 
         foreach (var brush in brushesToAdd) {
-            brushRegistry.Add(new BrushRegistration() { brush = brush, ShapeEditCount = -1, NeedsSlice = false });
+            brushRegistry.Add(new BrushRegistration(){brush=brush, ShapeEditCount=-1, NeedsSlice=false});
         }
 
         foreach (var brushID in brushIDsToRemove) {
@@ -84,8 +84,10 @@ public class PARoot : MonoBehaviour {
         foreach (var id in brushIDList) {
             adjacencyList.Add(id, new());
         }
-        for (int i = 0; i < brushIDList.Count - 1; i++) {
-            for (int j = i + 1; j < brushIDList.Count; j++) {
+        for (int i = 0; i < brushIDList.Count - 1; i++)
+        {
+            for (int j = i + 1; j < brushIDList.Count; j++)
+            {
                 var brushIDA = brushIDList[i];
                 var brushIDB = brushIDList[j];
                 var brushA = brushRegistry.Get(brushIDList[i]).brush;
@@ -133,7 +135,7 @@ public class PARoot : MonoBehaviour {
 
         var myMeshes = brushRegistry.GetValues().Select((reg) => reg.brush).Select((brush) => brush.GenerateMesh()).ToList();
         customMesh.mesh = Convert.Mesh(MyMeshUtilities.CombineMeshes(myMeshes));
-
+        
     }
 
 }
