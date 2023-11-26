@@ -16,7 +16,7 @@ public static class Convert {
         var size = Convert.Vector(transform.lossyScale);
         var pos = Convert.Vector(transform.position);
 
-        var matTransform = 
+        var matTransform =
             System.Numerics.Matrix4x4.CreateScale(size)
             * System.Numerics.Matrix4x4.CreateWorld(pos, frontDir, upDir);
         return matTransform;
