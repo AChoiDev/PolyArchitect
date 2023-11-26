@@ -1,6 +1,4 @@
 using PolyArchitect.Core;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PolyArchitect.Unity {
@@ -8,6 +6,15 @@ namespace PolyArchitect.Unity {
     // component wrapper for core brush 
     [ExecuteInEditMode()]
     public class PABrush : MonoBehaviour {
+        // NOTE: Temporary enum to control the type of brush generated
+        public enum BrushType {
+            Cylinder,
+            Box,
+            Cone,
+        }
+
+        // NOTE: Temporary variable to control the type of brush generated
+        public BrushType type;
 
         public BooleanOperation operation;
         private Core.Brush brush = null;
@@ -22,7 +29,19 @@ namespace PolyArchitect.Unity {
                     preMatrixTransform = transform.localToWorldMatrix;
                 }
             } else {
-                brush = Core.Brush.MakeCylinder(6, transform);
+                switch (type) {
+                    case BrushType.Cylinder:
+                        brush = Core.Brush.MakeCylinder(6, transform);
+                        break;
+                    case BrushType.Box:
+                        brush = Core.Brush.MakeBox(transform);
+                        break;
+                    case BrushType.Cone:
+                        brush = Core.Brush.MakeCone(6, transform);
+                        break;
+                    default:
+                        break;
+                }
                 preMatrixTransform = transform.localToWorldMatrix;
             }
         }
