@@ -6,9 +6,11 @@ using System;
 
 namespace PolyArchitect.Core {
     public partial class Scene : INodeObject {
-        private Dictionary<NodeID, List<NodeID>> childrenOfNode;
-        private Dictionary<NodeID, NodeID> parentOfNode;
-        private Dictionary<NodeID, object> objectOfNodeID;
+        private Dictionary<NodeID, List<NodeID>> childrenOfNode = new();
+        private Dictionary<NodeID, NodeID> parentOfNode = new();
+        private Dictionary<NodeID, object> objectOfNodeID = new();
+
+        private Dictionary<NodeID, Brush> brushOfNode = new();
         public Matrix4x4 LocalTransform { get => Matrix4x4.Identity; }
 
         private readonly NodeID sceneNodeID;

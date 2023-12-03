@@ -17,10 +17,6 @@ namespace PolyArchitect.Core {
 
         private readonly Dictionary<int, Vector3> planeIDToTexDir;
 
-        public List<Vector3> GetVertexList() {
-            return polygons.Vertices;
-        }
-
         private Brush(List<Plane> planes, List<Vector3> planeTexDir, Matrix4x4 worldTransform) {
             this.worldTransform = worldTransform;
             List<int> planeIDs;
