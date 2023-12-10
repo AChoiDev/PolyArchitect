@@ -210,7 +210,7 @@ namespace PolyArchitect.Core {
             }
         }
 
-        public Dictionary<int, List<Vector3>> GeneratePolygons(Matrix4x4 worldTransform) {
+        public Dictionary<FaceID, List<Vector3>> GeneratePolygons(Matrix4x4 worldTransform) {
             UnityEngine.Profiling.Profiler.BeginSample("Generate Polygons");
 
             var planeIDToPlaneEdges = new Dictionary<int, HashSet<InterEdge>>();
@@ -225,7 +225,7 @@ namespace PolyArchitect.Core {
                 }
             }
 
-            var planeIDToLoopedVertices = new Dictionary<int, List<Vector3>>();
+            var faceIDToLoopedVertices = new Dictionary<FaceID, List<Vector3>>();
 
             foreach (var planeID in planeIDToPlaneEdges.Keys) {
                 // TODO: Fix this
@@ -243,10 +243,10 @@ namespace PolyArchitect.Core {
                     loopedVertices.Reverse();
                 }
 
-                planeIDToLoopedVertices.Add(planeID, loopedVertices);
+                faceIDToLoopedVertices.Add(new FaceID(planeID), loopedVertices);
             }
 
-            return planeIDToLoopedVertices;
+            return faceIDToLoopedVertices;
         }
     }
 }

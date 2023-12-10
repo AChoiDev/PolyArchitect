@@ -25,7 +25,7 @@ namespace PolyArchitect.Core {
             this.brush = brush;
         }
 
-        public PolygonSide Categorize(ConvexPolygon polygon) {
+        public PolygonSide Categorize(ConvexPolygonGeometry polygon) {
             if (brush != null) {
                 return brush.Categorize(polygon);
             }

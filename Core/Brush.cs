@@ -1,4 +1,5 @@
 // stores the entire context related to a brush
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -9,27 +10,29 @@ namespace PolyArchitect.Core {
     public partial class Brush {
         private readonly ConvexPolyhedron polyhedron;
         private BrushCategorizer categorizer;
-        private PlanePolygons polygons;
-        private PolygonSides sides;
+        private Dictionary<FaceID, Face> faces;
         private Matrix4x4 worldTransform;
         private AxisAlignedBoundingBox aabb;
         public int ShapeEditCount { get; private set; }
 
-        private readonly Dictionary<int, Vector3> planeIDToTexDir;
-
         private Brush(List<Plane> planes, List<Vector3> planeTexDir, Matrix4x4 worldTransform) {
-            this.worldTransform = worldTransform;
-            List<int> planeIDs;
-            (this.polyhedron, planeIDs) = ConvexPolyhedron.Construct(planes);
-            planeIDToTexDir = new();
-            for (int i = 0; i < planes.Count; i++) {
-                planeIDToTexDir.Add(planeIDs[i], Vector3.TransformNormal(planeTexDir[i], worldTransform));
+            // List<int> planeIDs;
+            (polyhedron, _) = ConvexPolyhedron.Construct(planes);
+            // TODO: Fix this
+            // Dictionary<FaceID, Vector3> faceIDToTexDir = new();
+            // for (int i = 0; i < planes.Count; i++) {
+                // faceIDToTexDir.Add(planeIDs[i], Vector3.TransformNormal(planeTexDir[i], worldTransform));
+            // }
+
+            ChangeTransform(worldTransform);
+        }
+
+        private void GenerateFaces() {
+            var generatedPolygons = polyhedron.GeneratePolygons(worldTransform);
+            faces = new();
+            foreach (var (faceID, loopedVertices) in generatedPolygons) {
+                faces.Add(faceID, new Face(loopedVertices));
             }
-            categorizer = new BrushCategorizer(this.polyhedron, worldTransform);
-            this.ShapeEditCount = 1;
-            aabb = new AxisAlignedBoundingBox(polyhedron.GetTransformedVertices(worldTransform));
-            polygons = new PlanePolygons(polyhedron.GeneratePolygons(worldTransform));
-            sides = new PolygonSides(polygons.GetPolygonIDs(), polygons);
         }
 
 
@@ -38,11 +41,10 @@ namespace PolyArchitect.Core {
             categorizer = new BrushCategorizer(this.polyhedron, worldTransform);
             ShapeEditCount += 1;
             aabb = new AxisAlignedBoundingBox(polyhedron.GetTransformedVertices(worldTransform));
-            polygons = new PlanePolygons(polyhedron.GeneratePolygons(worldTransform));
-            sides = new PolygonSides(polygons.GetPolygonIDs(), polygons);
+            GenerateFaces();
         }
 
-        public PolygonSide Categorize(ConvexPolygon polygon) {
+        public PolygonSide Categorize(ConvexPolygonGeometry polygon) {
             return categorizer.CategorizePolygon(polygon);
         }
 
@@ -50,49 +52,54 @@ namespace PolyArchitect.Core {
             return AxisAlignedBoundingBox.DoesCollide(brushOne.aabb, brushTwo.aabb);
         }
 
+        private Dictionary<FaceID, HashSet<Plane>> MakeSliceDictionary(HashSet<ConvexPolygonGeometry> slicingPolygons) {
+            var sliceDictionary = new Dictionary<FaceID, HashSet<Plane>>();
+            foreach (var faceID in faces.Keys) {
+                sliceDictionary.Add(faceID, new());
+            }
+            var basePolygons = GetBasePolygons();
+            foreach (var slicingPolygon in slicingPolygons) {
+                foreach (var (faceID, faceBasePolygon) in basePolygons) {
+                    if (faceBasePolygon.DoesCollide(slicingPolygon)) {
+                        sliceDictionary[faceID].Add(slicingPolygon.GeneratePlane());
+                    }
+                }
+            }
+
+            return sliceDictionary;
+        }
+
+        private Dictionary<FaceID, ConvexPolygonGeometry> GetBasePolygons() {
+            Dictionary<FaceID, ConvexPolygonGeometry> basePolygons = new();
+            foreach (var (faceID, face) in faces) {
+                basePolygons.Add(faceID, face.baseGeometry);
+            }
+            return basePolygons;
+        }
+
         public void Slice(HashSet<Brush> otherBrushes) {
-            polygons = new PlanePolygons(polyhedron.GeneratePolygons(worldTransform));
+            GenerateFaces();
+
             foreach (var otherBrush in otherBrushes) {
-                polygons.SliceSelfWith(otherBrush.polygons);
+                var slicingPolygons = otherBrush.GetBasePolygons().Values.ToHashSet();
+                var sliceDictionary = MakeSliceDictionary(slicingPolygons);
+                foreach (var targetFaceID in sliceDictionary.Keys) {
+                    foreach (var slicePlane in sliceDictionary[targetFaceID]) {
+                        faces[targetFaceID].Slice(slicePlane);
+                    }
+                }
             }
-            sides = new PolygonSides(polygons.GetPolygonIDs(), polygons);
         }
 
-
-        public List<(int, int, int, int)> GenerateTris() {
-            var validPolygons = sides.GetValidPolygons();
-            foreach (var validPolygon in validPolygons) {
-                var center = validPolygon.AveragePos;
-                var planeID = validPolygon.originatingPlaneID;
-                var uDir = planeIDToTexDir[planeID];
-                var normalDir = Vector3.Normalize(Vector3.TransformNormal(polyhedron.GetPlaneNormal(planeID), worldTransform));
-                var vDir = -Vector3.Cross(uDir, normalDir);
-                UnityEngine.Gizmos.DrawLine(Convert.Vector(center), Convert.Vector(center + uDir * 0.1f));
-                UnityEngine.Gizmos.DrawLine(Convert.Vector(center), Convert.Vector(center + normalDir * 0.1f));
-                UnityEngine.Gizmos.DrawLine(Convert.Vector(center), Convert.Vector(center + vDir * 0.1f));
-            }
-            return sides.GenerateTris();
-        }
 
         public MyMesh GenerateMesh() {
             var meshVertices = new List<Vector3>();
             var meshIndices = new List<int>();
             var meshNormals = new List<Vector3>();
             var meshTexCoords = new List<Vector2>();
-            var planeIDToPolygonList = new Dictionary<int, List<ConvexPolygon>>();
-            var validPolygons = sides.GetValidPolygons();
-            foreach (var polygon in validPolygons) {
-                var planeID = polygon.originatingPlaneID;
-                if (planeIDToPolygonList.ContainsKey(planeID) == false) {
-                    planeIDToPolygonList.Add(planeID, new());
-                }
-                planeIDToPolygonList[planeID].Add(polygon);
-            }
 
-
-
-            foreach (var polygonList in planeIDToPolygonList.Values) {
-                GenerateTrisOfPlane(polygonList, meshVertices, meshIndices, meshNormals, meshTexCoords);
+            foreach (var face in faces.Values) {
+                face.AddTris(meshVertices, meshIndices, meshNormals, meshTexCoords);
             }
 
             var mesh = new MyMesh() {
@@ -105,43 +112,12 @@ namespace PolyArchitect.Core {
             return mesh;
         }
 
-        private void GenerateTrisOfPlane(List<ConvexPolygon> polygons,
-            List<Vector3> meshVertices, List<int> meshIndices,
-            List<Vector3> meshNormals, List<Vector2> meshTexCoords) {
-            var planeID = polygons[0].originatingPlaneID;
 
-            var vertexIDToIndex = new Dictionary<int, int>();
-
-            foreach (var polygon in polygons) {
-                var vertices = polygon.FetchVertices();
-                var uDir = planeIDToTexDir[planeID];
-                var vDir = -Vector3.Cross(uDir, polygon.Normal);
-                for (int i = 0; i < vertices.Count; i++) {
-                    var vertexID = polygon.LoopedVertexIDs[i];
-                    if (vertexIDToIndex.ContainsKey(vertexID) == false) {
-                        var vertex = vertices[i];
-                        meshVertices.Add(vertex);
-                        var u = Vector3.Dot(vertex, uDir);
-                        var v = Vector3.Dot(vertex, vDir);
-                        meshTexCoords.Add(new(u, v));
-                        meshNormals.Add(polygon.Normal);
-                        var index = meshVertices.Count - 1;
-                        vertexIDToIndex.Add(vertexID, index);
-                    }
-                }
-
-                var triangles = polygon.MakeTriangles();
-                foreach (var triplet in triangles) {
-                    meshIndices.Add(vertexIDToIndex[triplet.Item1]);
-                    meshIndices.Add(vertexIDToIndex[triplet.Item2]);
-                    meshIndices.Add(vertexIDToIndex[triplet.Item3]);
-                }
-            }
-
-        }
 
         public void CategorizePolygons(CSGTree tree) {
-            sides.CategorizeFromTree(tree);
+            foreach (var face in faces.Values) {
+                face.SetSidesFromTree(tree);
+            }
         }
 
     }

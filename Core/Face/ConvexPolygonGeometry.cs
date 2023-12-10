@@ -7,25 +7,20 @@ namespace PolyArchitect.Core {
     // A convex polygon defined by a list of vertices
     // such that consecutive items of the list form an edge
     // also the start and end of the list are an edge
-    public class ConvexPolygon {
+    public class ConvexPolygonGeometry {
 
         // Vertices in clockwise winding order
         public readonly List<int> LoopedVertexIDs;
-        public List<Vector3> FetchVertices() => LoopedVertexIDs.Select((ID) => brushPolygons.GetVertex(ID)).ToList();
+        public List<Vector3> FetchVertices() => LoopedVertexIDs.Select((ID) => vertexManager.Get(ID)).ToList();
 
-        // TODO: find more elegant way to retrieve vertices from IDs other than storing a refrence to plane polygons
-        private readonly PlanePolygons brushPolygons;
+        private readonly IVertexManager vertexManager;
 
         public readonly Vector3 Normal;
         public readonly Vector3 AveragePos;
 
-        // TODO: Remove originating plane ID
-        public readonly int originatingPlaneID;
-
-        public ConvexPolygon(List<int> loopedVertexIndices, PlanePolygons brushPolygons, int planeID) {
+        public ConvexPolygonGeometry(List<int> loopedVertexIndices, IVertexManager vertexManager) {
             this.LoopedVertexIDs = loopedVertexIndices;
-            this.brushPolygons = brushPolygons;
-            this.originatingPlaneID = planeID;
+            this.vertexManager = vertexManager;
 
             // store common polygon properties
             var verts = FetchVertices();
@@ -33,9 +28,9 @@ namespace PolyArchitect.Core {
             AveragePos = verts.Aggregate(Vector3.Add) * (1f / verts.Count);
         }
 
-        public ConvexPolygon MakeFlipped() {
+        public ConvexPolygonGeometry MakeFlipped() {
             var reversedOrder = LoopedVertexIDs.Select((id) => id).Reverse().ToList();
-            return new ConvexPolygon(reversedOrder, brushPolygons, originatingPlaneID);
+            return new ConvexPolygonGeometry(reversedOrder, vertexManager);
         }
 
         public Plane GeneratePlane() {
@@ -71,11 +66,11 @@ namespace PolyArchitect.Core {
         }
 
         // TODO: make this code not suck, including "point outside polygon tube"
-        public bool DoesCollide(ConvexPolygon otherPolygon) {
+        public bool DoesCollide(ConvexPolygonGeometry otherPolygon) {
             var thisEdges = GraphUtilities.EdgesOfCircularList(LoopedVertexIDs);
             foreach (var edge in thisEdges) {
-                var l0 = brushPolygons.GetVertex(edge.Item1);
-                var l1 = brushPolygons.GetVertex(edge.Item2);
+                var l0 = vertexManager.Get(edge.Item1);
+                var l1 = vertexManager.Get(edge.Item2);
                 var planeIntersection = Plane.LineIntersection(l0, l1, otherPolygon.AveragePos, otherPolygon.Normal);
                 if (planeIntersection.HasValue) {
                     if (otherPolygon.IsPointOutsidePolygonTube(planeIntersection.Value) == false) {
@@ -85,8 +80,8 @@ namespace PolyArchitect.Core {
             }
             var otherEdges = GraphUtilities.EdgesOfCircularList(otherPolygon.LoopedVertexIDs);
             foreach (var edge in otherEdges) {
-                var l0 = otherPolygon.brushPolygons.GetVertex(edge.Item1);
-                var l1 = otherPolygon.brushPolygons.GetVertex(edge.Item2);
+                var l0 = otherPolygon.vertexManager.Get(edge.Item1);
+                var l1 = otherPolygon.vertexManager.Get(edge.Item2);
                 var planeIntersection = Plane.LineIntersection(l0, l1, AveragePos, Normal);
                 if (planeIntersection.HasValue) {
                     if (IsPointOutsidePolygonTube(planeIntersection.Value) == false) {
@@ -102,17 +97,18 @@ namespace PolyArchitect.Core {
 
         public (List<int>, List<int>) PartitionPolygon(Plane slicingPlane) {
             var vertCount = LoopedVertexIDs.Count;
+            var loopedVertices = FetchVertices();
             var backLoop = new List<int>();
             var frontLoop = new List<int>();
             for (var i = 0; i < vertCount; i++) {
                 // start iteration at front index
                 var loopIndex = i % vertCount;
                 var vertexID = LoopedVertexIDs[loopIndex];
-                var side = slicingPlane.PointSide(brushPolygons.GetVertex(vertexID));
+                var side = slicingPlane.PointSide(loopedVertices[loopIndex]);
 
                 var nextLoopIndex = (loopIndex + 1) % LoopedVertexIDs.Count;
                 var nextVertexID = LoopedVertexIDs[nextLoopIndex];
-                var nextSide = slicingPlane.PointSide(brushPolygons.GetVertex(nextVertexID));
+                var nextSide = slicingPlane.PointSide(loopedVertices[nextLoopIndex]);
 
                 if (side >= 0) {
                     frontLoop.Add(vertexID);
@@ -124,7 +120,7 @@ namespace PolyArchitect.Core {
                 if ((side > 0 && nextSide < 0) || (side < 0 && nextSide > 0)) {
                     // found an edge that transitions between a back and a front node
                     // must create point that intersects with plane and add to both lists
-                    var newVertexID = brushPolygons.RegisterVertex(slicingPlane.LineIntersectionClamped(brushPolygons.GetVertex(vertexID), brushPolygons.GetVertex(nextVertexID)));
+                    var newVertexID = vertexManager.Add(slicingPlane.LineIntersectionClamped(vertexManager.Get(vertexID), vertexManager.Get(nextVertexID)));
                     frontLoop.Add(newVertexID);
                     backLoop.Add(newVertexID);
                 }
@@ -143,15 +139,15 @@ namespace PolyArchitect.Core {
         }
 
         // TODO: Simplify this, including the partitioner
-        public List<ConvexPolygon> Slice(Plane slicingPlane) {
+        public List<ConvexPolygonGeometry> Slice(Plane slicingPlane) {
             var (backLoop, frontLoop) = PartitionPolygon(slicingPlane);
 
-            var slicedPolygons = new List<ConvexPolygon>();
+            var slicedPolygons = new List<ConvexPolygonGeometry>();
             if (backLoop.Count >= 3) {
-                slicedPolygons.Add(new ConvexPolygon(backLoop, this.brushPolygons, originatingPlaneID));
+                slicedPolygons.Add(new ConvexPolygonGeometry(backLoop, vertexManager));
             }
             if (frontLoop.Count >= 3) {
-                slicedPolygons.Add(new ConvexPolygon(frontLoop, this.brushPolygons, originatingPlaneID));
+                slicedPolygons.Add(new ConvexPolygonGeometry(frontLoop, vertexManager));
             }
 
             return slicedPolygons;

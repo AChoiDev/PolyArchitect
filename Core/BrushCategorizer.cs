@@ -37,7 +37,7 @@ namespace PolyArchitect.Core {
 
 
         // we assume the polygon is either inside, outside, or aligned with brush
-        public PolygonSide CategorizePolygon(ConvexPolygon polygon) {
+        public PolygonSide CategorizePolygon(ConvexPolygonGeometry polygon) {
 
             var vertices = polygon.FetchVertices();
 
