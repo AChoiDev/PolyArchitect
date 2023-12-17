@@ -236,6 +236,11 @@ namespace PolyArchitect.Core {
                 --_size;
             }
 
+            /// <summary>
+            /// Loops an index to ensure it remains valid for this ring buffer.
+            /// </summary>
+            /// <param name="index">Said index.</param>
+            /// <returns></returns>
             public int LoopIndex(int index) {
                 return index % _size;
             }
