@@ -41,6 +41,10 @@ namespace PolyArchitect.Core {
 
             IHCommand command = redoHistory.Pop();
             command.Apply();
+
+            // NOTE: Max command limit doesn't need to be checked as it was already checked during the initial applying of the command
+            //       and the only way the check can be invalidated is if another command is performed which will clear the redo history
+            //       in turn not allowing this code to even be run.
             history.Push(command);
         }
 
@@ -52,6 +56,7 @@ namespace PolyArchitect.Core {
 
 
     // circular buffer implementation of command manager
+    // TODO: Verify with unit tests (when finally added) that this actually works before using.
     public class HCommandManagerCircularBuffer {
         public const int MAX_COMMANDS = 50;
 
