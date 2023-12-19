@@ -1,0 +1,150 @@
+[gd_scene load_steps=9 format=3 uid="uid://dvb2bjc56skgc"]
+
+[ext_resource type="PackedScene" uid="uid://cuedaakgiimhj" path="res://ui/menu_bar/menu_bar.tscn" id="1_dttc1"]
+[ext_resource type="Script" path="res://ui/editor/editor.gd" id="1_e2enh"]
+[ext_resource type="Script" path="res://ui/world/grid.gd" id="2_ow67i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl0ke"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.0784314, 0.0784314, 0.0784314, 1)
+
+[sub_resource type="Environment" id="Environment_pe1y2"]
+background_mode = 1
+background_color = Color(0.239216, 0.239216, 0.239216, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_eullp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dub7w"]
+shading_mode = 0
+disable_ambient_light = true
+vertex_color_use_as_albedo = true
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_k8eij"]
+
+[node name="Editor" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+script = ExtResource("1_e2enh")
+
+[node name="MenuBarMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="MenuBar" parent="MenuBarMargin" instance=ExtResource("1_dttc1")]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="CenterMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Center" type="HSplitContainer" parent="CenterMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Left" type="VSplitContainer" parent="CenterMargin/Center"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterMargin/Center/Left"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterMargin/Center/Left/VBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="CenterMargin/Center/Left/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Toolbar Button"
+
+[node name="HSeparator" type="HSeparator" parent="CenterMargin/Center/Left/VBoxContainer"]
+layout_mode = 2
+
+[node name="Tabs" type="TabContainer" parent="CenterMargin/Center/Left/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_jl0ke")
+
+[node name="Viewport" type="SubViewportContainer" parent="CenterMargin/Center/Left/VBoxContainer/Tabs"]
+layout_mode = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport"]
+handle_input_locally = false
+size = Vector2i(1246, 692)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
+environment = SubResource("Environment_pe1y2")
+
+[node name="Camera3D" type="Camera3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
+transform = Transform3D(0.773264, 0.311254, -0.552434, 0, 0.871232, 0.490872, 0.634084, -0.379574, 0.673692, -2.20973, 1.96349, 2.69477)
+
+[node name="Cube" type="MeshInstance3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
+mesh = SubResource("BoxMesh_eullp")
+
+[node name="Grid" type="MeshInstance3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
+material_override = SubResource("StandardMaterial3D_dub7w")
+mesh = SubResource("ImmediateMesh_k8eij")
+script = ExtResource("2_ow67i")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
+transform = Transform3D(0.707107, 0.5, -0.5, 0, 0.707107, 0.707107, 0.707107, -0.5, 0.5, 0, 5, 0)
+
+[node name="Panel2" type="Panel" parent="CenterMargin/Center/Left"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.25
+
+[node name="Right" type="VSplitContainer" parent="CenterMargin/Center"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+
+[node name="Panel" type="Panel" parent="CenterMargin/Center/Right"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Panel2" type="Panel" parent="CenterMargin/Center/Right"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.75
+
+[node name="Footer" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Footer"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="Label" type="Label" parent="Footer/MarginContainer"]
+layout_mode = 2
+text = "Generating brush shape (4/11)..."
+vertical_alignment = 1
+
+[node name="AboutPopup" type="AcceptDialog" parent="."]
+title = "About"
+initial_position = 2
+size = Vector2i(360, 160)
+unresizable = true
+dialog_text = "About stuff."

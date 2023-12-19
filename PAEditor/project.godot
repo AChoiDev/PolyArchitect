@@ -1,0 +1,41 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="PAEditor"
+run/main_scene="res://ui/editor/editor.tscn"
+config/features=PackedStringArray("4.2", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+MenuBarBus="*res://global/menu_bar_bus.gd"
+
+[debug]
+
+gdscript/warnings/enable=false
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/subwindows/embed_subwindows=false
+
+[filesystem]
+
+import/blender/enabled=false
+import/fbx/enabled=false
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0.0509804, 0.0509804, 0.0509804, 1)
