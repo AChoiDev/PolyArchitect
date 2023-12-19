@@ -24,7 +24,7 @@ shading_mode = 0
 disable_ambient_light = true
 vertex_color_use_as_albedo = true
 
-[sub_resource type="ImmediateMesh" id="ImmediateMesh_k8eij"]
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_mnoj8"]
 
 [node name="Editor" type="VBoxContainer"]
 anchors_preset = 15
@@ -102,7 +102,7 @@ mesh = SubResource("BoxMesh_eullp")
 
 [node name="Grid" type="MeshInstance3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
 material_override = SubResource("StandardMaterial3D_dub7w")
-mesh = SubResource("ImmediateMesh_k8eij")
+mesh = SubResource("ImmediateMesh_mnoj8")
 script = ExtResource("2_ow67i")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
