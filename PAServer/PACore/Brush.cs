@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
+using FaceID = int;
+
 namespace PolyArchitect.Core {
     // A convex polyhedron with UV coordinates, material IDs, and cached data
     // the leaf of a csg tree

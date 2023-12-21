@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace PolyArchitect.Core {
     public class Scenes {
         private Dictionary<Guid, Scene> scenes = new();
-        private Scene activeScene = null;
+        private Scene? activeScene = null;
 
         // If there is no active scene the newly made scene will become the active scene.
         public Guid MakeScene() {

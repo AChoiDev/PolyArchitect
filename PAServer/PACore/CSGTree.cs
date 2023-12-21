@@ -15,10 +15,10 @@ namespace PolyArchitect.Core {
         public string Name { get; private set; }
 
         public BooleanOperation operation;
-        private readonly Brush brush;
+        private readonly Brush? brush;
 
 
-        public CSGTree(BooleanOperation operation, string name, Brush brush = null) {
+        public CSGTree(BooleanOperation operation, string name, Brush? brush = null) {
             this.operation = operation;
             subTrees = new();
             this.Name = name;

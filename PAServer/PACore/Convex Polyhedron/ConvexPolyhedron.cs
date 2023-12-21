@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
+using FaceID = int;
+
 namespace PolyArchitect.Core {
 
     // A convex polyhedron defined by a set of intersecting planes
@@ -227,7 +229,7 @@ namespace PolyArchitect.Core {
                     loopedVertices.Reverse();
                 }
 
-                faceIDToLoopedVertices.Add(new FaceID(planeID), loopedVertices);
+                faceIDToLoopedVertices.Add(planeID, loopedVertices);
             }
 
             return faceIDToLoopedVertices;
