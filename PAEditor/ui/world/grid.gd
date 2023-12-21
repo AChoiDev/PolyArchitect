@@ -2,7 +2,7 @@
 extends MeshInstance3D
 
 
-const GRID_SIZE: float = 8.0;
+const GRID_SIZE: float = 32.0;
 const GRID_SPACING: float = 1.0;
 const GRID_EXTENT: float = GRID_SPACING * GRID_SIZE;
 const GRID_START: float = -GRID_EXTENT / 2;

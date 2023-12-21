@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=3 uid="uid://nujj30ai6tql"]
+
+[ext_resource type="Script" path="res://ui/console/console.gd" id="1_qffl3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_od78a"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.0901961, 0.0901961, 0.0901961, 1)
+border_width_bottom = 3
+border_color = Color(0.0313726, 0.0313726, 0.0313726, 1)
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Console" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.25
+script = ExtResource("1_qffl3")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Log" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/focus = SubResource("StyleBoxFlat_od78a")
+theme_override_styles/normal = SubResource("StyleBoxFlat_od78a")
+
+[node name="CommandLineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "command"
+
+[connection signal="gui_input" from="MarginContainer/VBoxContainer/CommandLineEdit" to="." method="_on_command_line_edit_gui_input"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/CommandLineEdit" to="." method="_on_command_line_edit_text_changed"]
+[connection signal="text_submitted" from="MarginContainer/VBoxContainer/CommandLineEdit" to="." method="_on_command_line_edit_text_submitted"]

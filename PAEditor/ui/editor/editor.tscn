@@ -1,8 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dvb2bjc56skgc"]
+[gd_scene load_steps=7 format=3 uid="uid://dvb2bjc56skgc"]
 
 [ext_resource type="PackedScene" uid="uid://cuedaakgiimhj" path="res://ui/menu_bar/menu_bar.tscn" id="1_dttc1"]
 [ext_resource type="Script" path="res://ui/editor/editor.gd" id="1_e2enh"]
-[ext_resource type="Script" path="res://ui/world/grid.gd" id="2_ow67i"]
+[ext_resource type="PackedScene" uid="uid://dcemjvg3khhqj" path="res://ui/world/world.tscn" id="3_sgi2y"]
+[ext_resource type="Script" path="res://ui/editor/viewport.gd" id="3_xeuag"]
+[ext_resource type="PackedScene" uid="uid://nujj30ai6tql" path="res://ui/console/console.tscn" id="4_y5nfr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl0ke"]
 content_margin_left = 6.0
@@ -10,21 +12,6 @@ content_margin_top = 6.0
 content_margin_right = 6.0
 content_margin_bottom = 6.0
 bg_color = Color(0.0784314, 0.0784314, 0.0784314, 1)
-
-[sub_resource type="Environment" id="Environment_pe1y2"]
-background_mode = 1
-background_color = Color(0.239216, 0.239216, 0.239216, 1)
-ambient_light_source = 2
-ambient_light_color = Color(1, 1, 1, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_eullp"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dub7w"]
-shading_mode = 0
-disable_ambient_light = true
-vertex_color_use_as_albedo = true
-
-[sub_resource type="ImmediateMesh" id="ImmediateMesh_mnoj8"]
 
 [node name="Editor" type="VBoxContainer"]
 anchors_preset = 15
@@ -80,38 +67,24 @@ layout_mode = 2
 [node name="Tabs" type="TabContainer" parent="CenterMargin/Center/Left/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_constants/side_margin = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jl0ke")
 
 [node name="Viewport" type="SubViewportContainer" parent="CenterMargin/Center/Left/VBoxContainer/Tabs"]
 layout_mode = 2
 stretch = true
+script = ExtResource("3_xeuag")
 
 [node name="SubViewport" type="SubViewport" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport"]
 handle_input_locally = false
+msaa_3d = 3
 size = Vector2i(1246, 692)
 render_target_update_mode = 4
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
-environment = SubResource("Environment_pe1y2")
+[node name="World" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport" instance=ExtResource("3_sgi2y")]
 
-[node name="Camera3D" type="Camera3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
-transform = Transform3D(0.773264, 0.311254, -0.552434, 0, 0.871232, 0.490872, 0.634084, -0.379574, 0.673692, -2.20973, 1.96349, 2.69477)
-
-[node name="Cube" type="MeshInstance3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
-mesh = SubResource("BoxMesh_eullp")
-
-[node name="Grid" type="MeshInstance3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
-material_override = SubResource("StandardMaterial3D_dub7w")
-mesh = SubResource("ImmediateMesh_mnoj8")
-script = ExtResource("2_ow67i")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="CenterMargin/Center/Left/VBoxContainer/Tabs/Viewport/SubViewport"]
-transform = Transform3D(0.707107, 0.5, -0.5, 0, 0.707107, 0.707107, 0.707107, -0.5, 0.5, 0, 5, 0)
-
-[node name="Panel2" type="Panel" parent="CenterMargin/Center/Left"]
+[node name="Console" parent="CenterMargin/Center/Left" instance=ExtResource("4_y5nfr")]
 layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.25
 
 [node name="Right" type="VSplitContainer" parent="CenterMargin/Center"]
 layout_mode = 2

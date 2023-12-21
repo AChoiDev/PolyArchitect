@@ -27,8 +27,6 @@ gdscript/warnings/enable=false
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/window_width_override=1280
-window/size/window_height_override=720
 window/subwindows/embed_subwindows=false
 
 [editor_plugins]
@@ -43,3 +41,4 @@ import/fbx/enabled=false
 [rendering]
 
 environment/defaults/default_clear_color=Color(0.0509804, 0.0509804, 0.0509804, 1)
+anti_aliasing/quality/msaa_3d=3
