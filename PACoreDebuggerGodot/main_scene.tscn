@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://dm0e4nume2ciu"]
+
+[ext_resource type="Script" path="res://CSGInterfaceGD.cs" id="1_744gq"]
+
+[node name="John" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, -1.74846e-07, 0, 1.74846e-07, 1, 0, 0, 0)
+script = ExtResource("1_744gq")
+
+[node name="Torso" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.9833, -11.4971)
+visible = false
+
+[node name="Heart" type="Node" parent="Torso"]
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21.6431, -16.6073)
+rotation_edit_mode = 2
+visible = false
+metadata/thinker = Vector2(0, 0)
+metadata/ideas = [Vector4i(0, 0, 0, 0), Vector4(0, 0, 0, 0), 0, Vector2(0, 0), null, null, null, null, null, null]
+
+[node name="Eyes" type="Node" parent="Head"]
+process_priority = 265
+editor_description = "This thing sees"
+
+[node name="Brain" type="Node" parent="Head"]
+editor_description = "This thing thinks"
