@@ -159,7 +159,7 @@ namespace PolyArchitect.Core {
             return adjacencyList;
         }
 
-        public void SliceBrushes() {
+        private void SliceBrushes() {
             var brushCollisionLists = FindBrushCollisionLists();
             foreach (var (brushID, brushCollisionList) in brushCollisionLists) {
                 var collidedBrushes = brushCollisionList.Select(Get<Brush>).ToHashSet();
@@ -167,13 +167,22 @@ namespace PolyArchitect.Core {
             }    
         }
 
-        public void CategorizeBrushSplitPolygons() {
+        private void CategorizeBrushSplitPolygons() {
             var csgTree = Traverse(ROOT_NODE_ID, new CSGTree(BooleanOperation.Add, "root"));
-            // TODO: implement this
-            // foreach (var brush in nodeRegistry.GetValues().Select((reg) => reg.brush)) {
-                // brush.DrawNormal();
-                // brush.CategorizePolygons(csgTree);
-            // }
+            var brushes = nodeRegistry.Values.Select((node) => node.Content as Brush)
+                .Where((content) => content != null).ToList();
+            foreach (var brush in brushes) {
+                brush.CategorizePolygons(csgTree);
+            }
+        }
+
+        public MyMesh GenerateMesh() {
+            SliceBrushes();
+            CategorizeBrushSplitPolygons();
+            var brushes = nodeRegistry.Values.Select((node) => node.Content as Brush)
+                .Where((content) => content != null).ToList();
+            var brushMeshes = brushes.Select((brush) => brush.GenerateMesh()).ToList();
+            return MyMeshUtilities.CombineMeshes(brushMeshes);
         }
     }
 }
