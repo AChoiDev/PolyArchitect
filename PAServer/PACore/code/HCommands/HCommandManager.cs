@@ -3,25 +3,20 @@ namespace PolyArchitect.Core {
     using System;
     using System.Collections.Generic;
 
-    // stack implementation of command manager
-    public class HCommandManagerStack {
-        public const int MAX_COMMANDS = 50;
+    public class HCommandStack {
+        public const int MAX_COMMANDS = 64;
 
-        private Stack<IHCommand> history = new(MAX_COMMANDS);
+        private CircularBuffer<IHCommand> history = new(MAX_COMMANDS);
+
+        // NOTE: The circular buffer will ensure the redo history stack will never grow larer
+        //       than the max commands count.
         private Stack<IHCommand> redoHistory = new(MAX_COMMANDS);
 
         public void Do(IHCommand command) {
             redoHistory.Clear();
 
-            // NOTE: The circular buffer implementation avoids the expensive copying of values
-            //       needed to limt the stack size.
-            if (history.Count >= MAX_COMMANDS) {
-                IHCommand[] commands = history.ToArray();
-                history = new Stack<IHCommand>(commands[1..]);
-            }
-
             command.Apply();
-            history.Push(command);
+            history.PushBack(command);
         }
 
         public void Undo() {
@@ -29,7 +24,7 @@ namespace PolyArchitect.Core {
                 throw new Exception(); // TODO: Handle invalid undo request
             }
 
-            IHCommand command = history.Pop();
+            IHCommand command = history.PopBack();
             command.Undo();
             redoHistory.Push(command);
         }
@@ -40,67 +35,13 @@ namespace PolyArchitect.Core {
             }
 
             IHCommand command = redoHistory.Pop();
-            command.Apply();
-
-            // NOTE: Max command limit doesn't need to be checked as it was already checked during the initial applying of the command
-            //       and the only way the check can be invalidated is if another command is performed which will clear the redo history
-            //       in turn not allowing this code to even be run.
-            history.Push(command);
+            command.Perform();
+            history.PushBack(command);
         }
 
         public void Clear() {
             history.Clear();
             redoHistory.Clear();
-        }
-    }
-
-
-    // circular buffer implementation of command manager
-    // TODO: Verify with unit tests (when finally added) that this actually works before using.
-    public class HCommandManagerCircularBuffer {
-        public const int MAX_COMMANDS = 50;
-
-        private CircularBuffer<IHCommand> history = new(MAX_COMMANDS);
-        private int redoCount = 0;
-
-        public void Do(IHCommand command) {
-            command.Apply();
-            
-            for (int i = 0; i < redoCount; i++) {
-                history.PopBack();
-            }
-            redoCount = 0;
-
-            history.PushBack(command);
-        }
-
-        public void Undo() {
-            if (history.Size <= redoCount || redoCount == MAX_COMMANDS) {
-                throw new Exception(); // TODO: Handle invalid undo request
-            }
-
-            IHCommand back = history.Back();
-            back.Undo();
-
-            redoCount += 1;
-        }
-
-        public void Redo() {
-            if (redoCount == 0) {
-                throw new Exception(); // TODO: Handle invalid redo request
-            }
-            redoCount -= 1;
-
-            int commandIndex = history.End - redoCount;
-            commandIndex = history.LoopIndex(commandIndex);
-
-            IHCommand command = history[commandIndex];
-            command.Apply();
-        }
-
-        public void Clear() {
-            history.Clear();
-            redoCount = 0;
         }
     }
 }
