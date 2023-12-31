@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://cuedaakgiimhj"]
+
+[ext_resource type="Script" path="res://ui/menu_bar/file_menu.gd" id="1_6vpi6"]
+[ext_resource type="Script" path="res://ui/menu_bar/edit_menu.gd" id="2_4htlm"]
+[ext_resource type="Script" path="res://ui/menu_bar/windows_menu.gd" id="3_4nmbb"]
+[ext_resource type="Script" path="res://ui/menu_bar/help_menu.gd" id="3_gw7wf"]
+
+[node name="MenuBar" type="MenuBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="File" type="PopupMenu" parent="."]
+script = ExtResource("1_6vpi6")
+
+[node name="Edit" type="PopupMenu" parent="."]
+script = ExtResource("2_4htlm")
+
+[node name="Windows" type="PopupMenu" parent="."]
+script = ExtResource("3_4nmbb")
+
+[node name="Help" type="PopupMenu" parent="."]
+script = ExtResource("3_gw7wf")

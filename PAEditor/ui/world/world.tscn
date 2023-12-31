@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3 uid="uid://dcemjvg3khhqj"]
+
+[ext_resource type="Script" path="res://ui/world/grid.gd" id="1_s3kl6"]
+[ext_resource type="Script" path="res://ui/world/camera_controller.gd" id="2_35jku"]
+
+[sub_resource type="Environment" id="Environment_pe1y2"]
+background_mode = 1
+background_color = Color(0.239216, 0.239216, 0.239216, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+volumetric_fog_density = 0.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_eullp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dub7w"]
+shading_mode = 0
+disable_ambient_light = true
+vertex_color_use_as_albedo = true
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_x7red"]
+
+[node name="World" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_pe1y2")
+
+[node name="Cube" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_eullp")
+skeleton = NodePath("../..")
+
+[node name="Grid" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_dub7w")
+mesh = SubResource("ImmediateMesh_x7red")
+skeleton = NodePath("../..")
+script = ExtResource("1_s3kl6")
+
+[node name="Node3D" type="Node3D" parent="."]
+script = ExtResource("2_35jku")
+
+[node name="Camera3D" type="Camera3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.5, 0.612372, -0.612373, 0, 0.707107, 0.707107, 0.866025, -0.353553, 0.353553, 0, 5, 0)
