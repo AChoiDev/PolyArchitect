@@ -12,12 +12,13 @@ config_version=5
 
 config/name="PAEditor"
 run/main_scene="res://ui/editor/editor.tscn"
-config/features=PackedStringArray("4.2", "Forward Plus")
+config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 MenuBarBus="*res://global/menu_bar_bus.gd"
+PAWorkerInterface="*res://global/PAWorkerInterface.cs"
 
 [debug]
 
@@ -28,6 +29,10 @@ gdscript/warnings/enable=false
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/subwindows/embed_subwindows=false
+
+[dotnet]
+
+project/assembly_name="PAEditor"
 
 [editor_plugins]
 

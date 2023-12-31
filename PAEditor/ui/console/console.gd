@@ -11,7 +11,18 @@ const MAX_COMMAND_HISTORY: int = 512;
 var _current_command: String = "";
 var _command_history: Array = [];
 var _current_history_index: int = CURRENT_COMMAND_INDEX;
+var _interface: Node = null;
 
+func _onConnect() -> void:
+	log_label.add_text("Connected to PA-Worker" + "\n");
+
+func _pong(x) -> void:
+	log_label.add_text(x + "\n");
+
+func _ready() -> void:
+	_interface = get_node("/root/PAWorkerInterface");
+	_interface.Subscribe("OnConnect", _onConnect);
+	_interface.Subscribe("Pong", _pong);
 
 func _next() -> void:
 	if _current_history_index == CURRENT_COMMAND_INDEX:
@@ -68,6 +79,9 @@ func _on_command_line_edit_text_submitted(new_text: String) -> void:
 	
 	_current_history_index = CURRENT_COMMAND_INDEX;
 	_current_command = "";
+
+	if new_text == "ping":
+		_interface.Ping();
 
 
 func _on_command_line_edit_gui_input(event: InputEvent) -> void:
