@@ -33,6 +33,9 @@ namespace PolyArchitect.Editor {
 			ProcessRequests();
         }
 
+		// Loops through each request in the queue, checking their status
+		// dequeues if completed, requeues if in progress
+		// throws exception if request encountered error
 		public static void ProcessRequests() {
 			var requestCount = requests.Count;
 			for (int i = 0; i < requestCount; i++)
@@ -64,7 +67,10 @@ namespace PolyArchitect.Editor {
 			}
 		}
 
-		public static List<IDisposable> BuildStaticSubscriptions() =>
+		// global subscriptions to signalr messages
+		// stores them for later disposal
+		// TODO: dispose these on editor close
+		private static List<IDisposable> BuildStaticSubscriptions() =>
 		[
 			connection.On<string, bool>("SceneAvailable", 
 				(sceneID, availability) => {
@@ -90,6 +96,7 @@ namespace PolyArchitect.Editor {
 			),
 		];
 		
+		// general request method used by GDScript
 		public static void Request(string requestName, GDArray vArguments) {
 			// good-enough-for-now ping solution
 			if (requestName == "Ping") {
@@ -103,10 +110,11 @@ namespace PolyArchitect.Editor {
 
 		// TODO: Add conversions that map types like vector3 and quaternion4
 		// to float3 and float4
-		public static object ConvertArg(Variant vArg) {
+		private static object ConvertArg(Variant vArg) {
 			return vArg.Obj;
 		}
 
+		// basic observer pattern for handling updates obtained from the PAWorker
 		public static void Subscribe(string msgName, Callable callable) {
 			if (msgNameToCallbacks.TryGetValue(msgName, out var callbacks)) {
 				callbacks.Add(callable);
@@ -114,6 +122,7 @@ namespace PolyArchitect.Editor {
 				msgNameToCallbacks.Add(msgName, [callable]);
 			}
 		}
+
 		private static void Message(string name, params Variant[] args) {
 			if (msgNameToCallbacks.TryGetValue(name, out var callbacks)) {
 				callbacks.ForEach((cb) => cb.CallDeferred(args));
