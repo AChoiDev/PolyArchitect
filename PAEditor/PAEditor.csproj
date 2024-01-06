@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.2.1">
+<Project Sdk="Godot.NET.Sdk/4.2.0">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net7.0</TargetFramework>
@@ -8,4 +8,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="addons\gdUnit4\**" />
+    <Compile Remove="addons\gdUnit4\**" />
+    <EmbeddedResource Remove="addons\gdUnit4\**" />
+    <None Remove="addons\gdUnit4\**" />
+  </ItemGroup>
+
 </Project>
