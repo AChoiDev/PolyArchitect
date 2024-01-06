@@ -20,7 +20,7 @@ namespace PolyArchitect.Core {
         }
 
         public void Undo() {
-            if (history.Count == 0) {
+            if (history.Size == 0) {
                 throw new Exception(); // TODO: Handle invalid undo request
             }
 
@@ -35,7 +35,7 @@ namespace PolyArchitect.Core {
             }
 
             IHCommand command = redoHistory.Pop();
-            command.Perform();
+            command.Apply();
             history.PushBack(command);
         }
 

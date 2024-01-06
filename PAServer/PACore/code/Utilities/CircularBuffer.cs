@@ -218,11 +218,13 @@ namespace PolyArchitect.Core {
             /// Removes the element at the back of the buffer. Decreasing the 
             /// Buffer size by 1.
             /// </summary>
-            public void PopBack() {
+            public T PopBack() {
                 ThrowIfEmpty("Cannot take elements from an empty buffer.");
+                var backELement = Back();
                 Decrement(ref _end);
                 _buffer[_end] = default(T);
                 --_size;
+                return backELement;
             }
 
             /// <summary>
