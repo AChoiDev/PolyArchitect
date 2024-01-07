@@ -5,7 +5,10 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PACore", "PACore\PACore.csproj", "{6748723C-0FAB-4AA8-870B-4319657BF8B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PAWorker", "PAWorker\PAWorker.csproj", "{4CAB84A3-44B0-4EEB-BA01-1FBE14C2E195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAWorker", "PAWorker\PAWorker.csproj", "{4CAB84A3-44B0-4EEB-BA01-1FBE14C2E195}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6748723C-0FAB-4AA8-870B-4319657BF8B4} = {6748723C-0FAB-4AA8-870B-4319657BF8B4}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
