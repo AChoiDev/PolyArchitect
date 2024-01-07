@@ -20,12 +20,18 @@ func _pong(x) -> void:
 	log_label.add_text(x + "\n");
 func _sceneSaved(x) -> void:
 	log_label.add_text("Scene Saved: " + x + "\n")
+func _sceneAvailable(id, availability) -> void:
+	if availability:
+		log_label.add_text("Scene Now Available: " + id + "\n")
+	else: 
+		log_label.add_text("Scene Now Unavailable: " + id + "\n")
 
 func _ready() -> void:
 	_interface = get_node("/root/PAWorkerInterface");
 	_interface.Subscribe("OnConnect", _onConnect);
 	_interface.Subscribe("Pong", _pong);
 	_interface.Subscribe("SceneSaved", _sceneSaved);
+	_interface.Subscribe("SceneAvailable", _sceneAvailable);
 
 func _next() -> void:
 	if _current_history_index == CURRENT_COMMAND_INDEX:
@@ -87,6 +93,8 @@ func _on_command_line_edit_text_submitted(new_text: String) -> void:
 		_interface.Request("Ping", []);
 	elif new_text == "save_scene":
 		_interface.Request("SaveScene", ["sceneIDFake", "pathFake"]);
+	elif new_text == "create_scene":
+		_interface.Request("CreateScene", [])
 
 
 func _on_command_line_edit_gui_input(event: InputEvent) -> void:

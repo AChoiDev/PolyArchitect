@@ -2,37 +2,23 @@ using System;
 using System.Collections.Generic;
 
 namespace PolyArchitect.Core {
-    public class Scenes {
-        private Dictionary<Guid, Scene> scenes = new();
-        private Scene? activeScene = null;
+    public class SceneRegistry {
+        private readonly Dictionary<Guid, Scene> scenes = [];
 
-        // If there is no active scene the newly made scene will become the active scene.
+        public Scene GetScene(Guid sceneID) => scenes[sceneID];
+
         public Guid MakeScene() {
             Guid sceneId = CreateSceneId();
 
-            Scene scene = new Scene();
+            Scene scene = new();
             scenes.Add(sceneId, scene);
 
-            if (activeScene == null) {
-                activeScene = scene;
-            }
-
             return sceneId;
-        }
-
-        public void SetActiveScene(Guid sceneId) {
-            if (scenes.ContainsKey(sceneId)) {
-                activeScene = scenes[sceneId];
-            }
         }
 
         public void DeleteScene(Guid sceneId) {
             if (scenes.ContainsKey(sceneId)) {
                 Scene scene = scenes[sceneId];
-
-                if (activeScene == scene) {
-                    activeScene = null;
-                }
             }
 
             scenes.Remove(sceneId);
