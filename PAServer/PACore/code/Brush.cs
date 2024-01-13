@@ -10,43 +10,53 @@ namespace PolyArchitect.Core {
     // A convex polyhedron with UV coordinates, material IDs, and cached data
     // the leaf of a csg tree
     public partial class Brush : INodeContent {
-        private readonly ConvexPolyhedron polyhedron;
+        public ConvexPolyhedron Polyhedron {get; private set;}
         private BrushCategorizer categorizer;
         private Dictionary<FaceID, Face> faces;
-        public Matrix4x4 worldTransform {get; set;}
-        public int ShapeEditCount { get; private set; }
+        public Matrix4x4 WorldTransform {get; set;}
 
         public AxisAlignedBoundingBox AABB(Matrix4x4 worldTransform)
-            => new (polyhedron.GetTransformedVertices(worldTransform));
+            => new (Polyhedron.GetTransformedVertices(worldTransform));
 
         public readonly BooleanOperation operation;
 
-        public Brush(List<Plane> planes, Matrix4x4 worldTransform, BooleanOperation operation) {
+        public Brush(ConvexPolyhedron polyhedron, BooleanOperation operation) {
             this.operation = operation;
+            Polyhedron = polyhedron;
+            WorldTransform = Matrix4x4.Identity;
+
+            OnShapeChange();
             // List<int> planeIDs;
-            (polyhedron, _) = ConvexPolyhedron.Construct(planes);
+            // (polyhedron, _) = ConvexPolyhedron.Construct(planes);
             // TODO: Fix this
             // Dictionary<FaceID, Vector3> faceIDToTexDir = new();
             // for (int i = 0; i < planes.Count; i++) {
                 // faceIDToTexDir.Add(planeIDs[i], Vector3.TransformNormal(planeTexDir[i], worldTransform));
             // }
-
-            ChangeTransform(worldTransform);
         }
 
+
         private void GenerateFaces() {
-            var generatedPolygons = polyhedron.GeneratePolygons(worldTransform);
-            faces = new();
+            var generatedPolygons = Polyhedron.GeneratePolygons(WorldTransform);
+            faces = [];
             foreach (var (faceID, loopedVertices) in generatedPolygons) {
                 faces.Add(faceID, new Face(loopedVertices));
             }
         }
 
+        // overrides virtual function in INodeContent
+        public void OnGlobalTransformChange(Matrix4x4 transform) {
+            WorldTransform = transform;
+            OnShapeChange();
+        }
 
-        public void ChangeTransform(Matrix4x4 worldTransform) {
-            this.worldTransform = worldTransform;
-            categorizer = new BrushCategorizer(this.polyhedron, worldTransform);
-            ShapeEditCount += 1;
+        public void SetPolyhedron(ConvexPolyhedron polyhedron) {
+            Polyhedron = polyhedron;
+            OnShapeChange();
+        }
+
+        private void OnShapeChange() {
+            categorizer = new BrushCategorizer(Polyhedron, WorldTransform);
             GenerateFaces();
         }
 
@@ -57,7 +67,7 @@ namespace PolyArchitect.Core {
         private Dictionary<FaceID, HashSet<Plane>> MakeSliceDictionary(HashSet<ConvexPolygonGeometry> slicingPolygons) {
             var sliceDictionary = new Dictionary<FaceID, HashSet<Plane>>();
             foreach (var faceID in faces.Keys) {
-                sliceDictionary.Add(faceID, new());
+                sliceDictionary.Add(faceID, []);
             }
             var basePolygons = GetBasePolygons();
             foreach (var slicingPolygon in slicingPolygons) {
@@ -93,7 +103,7 @@ namespace PolyArchitect.Core {
             }
 
             // foreach (var face in faces) {
-            //     face.Value.PenDebugDrawSplitPolygons();
+                //     face.Value.PenDebugDrawSplitPolygons();
             // }
         }
 

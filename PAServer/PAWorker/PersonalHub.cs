@@ -33,20 +33,21 @@ namespace PolyArchitect.Worker {
         public async Task CreateBrush(string strSceneID) {
             var sceneID = Guid.Parse(strSceneID);
             var scene = sceneReg.GetScene(sceneID);
-            var brush = new Brush(BrushBuilders.MakeRectangularCuboid(Vector3.UnitY, Vector3.UnitZ).Item1, Matrix4x4.Identity, BooleanOperation.Add);
+            var cubeShape = ConvexPolyhedron.Construct(BrushBuilders.MakeRectangularCuboid(Vector3.UnitY, Vector3.UnitZ).Item1).Item1;
+            var brush = new Brush(cubeShape, BooleanOperation.Add);
             var brushID = scene.MakeNode(brush);
             await Clients.All.SendAsync("NodeCreated", sceneID, brushID);
         }
-        public async Task SetTransform(string sceneID, int nodeID, float3 pos) {
+        public async Task SetTransform(string strSceneID, int nodeID, float3 pos) {
             var transform = "placeholder";
             await Clients.All.SendAsync("TransformWasSet", nodeID, transform);
         }
-        public async Task Parent(string sceneID, int nodeID, string parentID) {
+        public async Task Parent(string strSceneID, int nodeID, int parentID, int childIdx) {
             var hierarchy = "placeholder";
-            await Clients.All.SendAsync("HierarchyUpdate", sceneID, hierarchy);
+            await Clients.All.SendAsync("HierarchyUpdate", strSceneID, hierarchy);
         }
-        public async Task Destroy(string sceneID, int nodeID) {
-            await Clients.All.SendAsync("Destroyed", sceneID, nodeID);
+        public async Task Destroy(string strSceneID, int nodeID) {
+            await Clients.All.SendAsync("Destroyed", strSceneID, nodeID);
         }
 
         public async Task Ping() {
