@@ -6,8 +6,6 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PolyArchitect">
-      <HintPath>..\PAServer\PACore\bin\Debug\net8.0\PACore.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\PAServer\PACore\PACore.csproj" />
   </ItemGroup>
 </Project>

@@ -18,3 +18,4 @@ config/icon="res://icon.svg"
 [dotnet]
 
 project/assembly_name="PACoreDebuggerGodot"
+project/solution_directory="../PAServer/PAServer.sln"
