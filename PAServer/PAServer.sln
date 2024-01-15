@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAWorker", "PAWorker\PAWork
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PACoreDebuggerGodot", "..\PACoreDebuggerGodot\PACoreDebuggerGodot.csproj", "{F54CEFA5-CAF8-4736-8AEE-4681AFCAC310}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAEditor", "..\PAEditor\PAEditor.csproj", "{1D86CA1E-586B-455D-87B3-2241FC302ADB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,14 @@ Global
 		{F54CEFA5-CAF8-4736-8AEE-4681AFCAC310}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 		{F54CEFA5-CAF8-4736-8AEE-4681AFCAC310}.Release|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{F54CEFA5-CAF8-4736-8AEE-4681AFCAC310}.Release|Any CPU.Build.0 = ExportRelease|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.Release|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.Release|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

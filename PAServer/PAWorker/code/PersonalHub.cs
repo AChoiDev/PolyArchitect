@@ -5,17 +5,14 @@ using System.Numerics;
 namespace PolyArchitect.Worker {
     using float3 = (float X, float Y, float Z);
     using float4 = (float W, float X, float Y, float Z);
-    public class PersonalHub : Hub {
-        private readonly SceneRegistry sceneReg = new();
-        // public override async Task OnConnectedAsync() {
+    public class PersonalHub(AdoptionLifetime adoptionLifetime, PACoreService core) : Hub {
 
-        // }
-#region Scene
+        #region Scene
         public async Task SaveScene(string sceneID, string path) {
             await Clients.All.SendAsync("SceneSaved", sceneID);
         }
         public async Task CreateScene() {
-            var strSceneID = sceneReg.MakeScene().ToString();
+            var strSceneID = core.Scenes.MakeScene().ToString();
             await Clients.All.SendAsync("SceneAvailable", strSceneID, true);
         }
         public async Task LoadScene(string path) {
@@ -24,7 +21,7 @@ namespace PolyArchitect.Worker {
         }
         public async Task UnloadScene(string strSceneID) {
             var sceneID = Guid.Parse(strSceneID);
-            sceneReg.DeleteScene(sceneID);
+            // sceneReg.DeleteScene(sceneID);
 
             await Clients.All.SendAsync("SceneAvailable", strSceneID, false);
         }
@@ -32,7 +29,7 @@ namespace PolyArchitect.Worker {
         
         public async Task CreateBrush(string strSceneID) {
             var sceneID = Guid.Parse(strSceneID);
-            var scene = sceneReg.GetScene(sceneID);
+            var scene = core.Scenes.GetScene(sceneID);
             var cubeShape = ConvexPolyhedron.Construct(BrushBuilders.MakeRectangularCuboid(Vector3.UnitY, Vector3.UnitZ).Item1).Item1;
             var brush = new Brush(cubeShape, BooleanOperation.Add);
             var brushID = scene.MakeNode(brush);
@@ -52,6 +49,11 @@ namespace PolyArchitect.Worker {
 
         public async Task Ping() {
             await Clients.All.SendAsync("Pong", Context.ConnectionId);
+        }
+
+        public Task AdoptionCheckUp() {
+            adoptionLifetime.CheckUp();
+            return Task.CompletedTask;
         }
     }
 }

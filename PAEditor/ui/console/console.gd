@@ -9,6 +9,7 @@ const MAX_COMMAND_HISTORY: int = 512;
 
 
 var _current_command: String = "";
+var _auto_scene_ID: String = "";
 var _command_history: Array = [];
 var _current_history_index: int = CURRENT_COMMAND_INDEX;
 var _interface: Node = null;
@@ -26,12 +27,17 @@ func _sceneAvailable(id, availability) -> void:
 	else: 
 		log_label.add_text("Scene Now Unavailable: " + id + "\n")
 
+
+func _nodeCreated(scnID, nodeID) -> void:
+	log_label.add_text("Node created with ID: " + str(nodeID) + "\n")
+
 func _ready() -> void:
 	_interface = get_node("/root/PAWorkerInterface");
 	_interface.Subscribe("OnConnect", _onConnect);
 	_interface.Subscribe("Pong", _pong);
 	_interface.Subscribe("SceneSaved", _sceneSaved);
 	_interface.Subscribe("SceneAvailable", _sceneAvailable);
+	_interface.Subscribe("NodeCreated", _nodeCreated);
 
 func _next() -> void:
 	if _current_history_index == CURRENT_COMMAND_INDEX:
@@ -84,10 +90,11 @@ func _on_command_line_edit_text_submitted(new_text: String) -> void:
 	if _command_history.size() > MAX_COMMAND_HISTORY:
 		_command_history.pop_front();
 	
-	log_label.add_text(new_text + "\n");
 	
 	_current_history_index = CURRENT_COMMAND_INDEX;
 	_current_command = "";
+
+	var command_components = new_text.split(" ");
 
 	if new_text == "ping":
 		_interface.Request("Ping", []);
@@ -95,6 +102,14 @@ func _on_command_line_edit_text_submitted(new_text: String) -> void:
 		_interface.Request("SaveScene", ["sceneIDFake", "pathFake"]);
 	elif new_text == "create_scene":
 		_interface.Request("CreateScene", [])
+	elif command_components[0] == "set_auto_scene_id" and command_components.size() == 2:
+		log_label.add_text("Auto Scene ID set\n");
+		_auto_scene_ID = command_components[1]
+	elif command_components[0] == "create_brush" and command_components.size() == 1:
+		_interface.Request("CreateBrush", [_auto_scene_ID])
+	else:
+		log_label.add_text("Command not found\n");
+
 
 
 func _on_command_line_edit_gui_input(event: InputEvent) -> void:

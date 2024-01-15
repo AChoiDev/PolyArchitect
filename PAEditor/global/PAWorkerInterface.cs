@@ -22,15 +22,62 @@ namespace PolyArchitect.Editor {
 		// but this is good enough for now
         private static DateTime lastPingTime;
 
+		private static Task startPAWorkerTask;
+
 		private readonly static Queue<Request> requests = [];
 
 		public override void _Ready()  {
-			MakeConnection();
+			startPAWorkerTask = StartPAWorker();
+		}
+
+		private static async Task StartPAWorker() {
+			GD.Print("Starting PAWorker...");
+
+			var runBuildBeforeStartingExecutable = true;
+			if (runBuildBeforeStartingExecutable) {
+				GDArray rawBuildOutputArray = [];
+				var buildTask = Task.Run(() => {
+					OS.Execute("dotnet", ["build", "../PAServer/PAWorker/PAWorker.csproj"], rawBuildOutputArray);
+					var succeeded = ((string)rawBuildOutputArray[0]).Contains("Build succeeded");
+					if (succeeded == false) {
+						throw new Exception("Encountered build error with PAWorker");
+					}
+				});
+				await buildTask;
+				GD.Print("PAWorker csproj built with output:");
+				GD.Print(rawBuildOutputArray[0]);
+			}
+
+			var pid = -1;
+			var runTask = Task.Run(() => {
+				var exePath = "../PAServer/PAWorker/bin/Debug/net8.0/PAWorker.exe";
+				pid = OS.CreateProcess(exePath, [], true);
+				if (pid == -1) {
+					throw new Exception("Could not create worker process");
+				}
+			});
+			await runTask;
+			GD.Print($"PAWorker process started at pid: {pid}");
+			var port = 5000;
+
+			connection = new HubConnectionBuilder()
+				.WithUrl($"http://localhost:{port}/debugTest").Build();
+			await connection.StartAsync();
+			GD.Print($"PAWorker connected, listening on port: {port}");
+
 			StaticSubscriptions = BuildStaticSubscriptions();
 		}
         public override void _Process(double delta)
         {
-			ProcessRequests();
+			if (connection?.State == HubConnectionState.Connected) {
+				Request("AdoptionCheckUp", []);
+				ProcessRequests();
+			}
+			if (startPAWorkerTask.IsCompleted && startPAWorkerTask.IsCompletedSuccessfully == false) {
+				GD.PrintErr("Could not start PAWorker, quitting application");
+				GetTree().Quit();
+				throw startPAWorkerTask.Exception;
+			}
         }
 
 		// Loops through each request in the queue, checking their status
@@ -55,15 +102,6 @@ namespace PolyArchitect.Editor {
 					requests.Enqueue(request);
 				}
 				
-			}
-		}
-
-		private async static void MakeConnection() {
-			connection = new HubConnectionBuilder()
-				.WithUrl("http://localhost:5036/debugTest").Build();
-			await connection.StartAsync();
-			if (connection.State == HubConnectionState.Connected) {
-				Message("OnConnect");
 			}
 		}
 

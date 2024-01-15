@@ -102,9 +102,9 @@ namespace PolyArchitect.Core {
                 }
             }
 
-            // foreach (var face in faces) {
-                //     face.Value.PenDebugDrawSplitPolygons();
-            // }
+            foreach (var face in faces) {
+                    face.Value.PenDebugDrawSplitPolygons();
+            }
         }
 
 
