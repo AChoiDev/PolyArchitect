@@ -28,12 +28,12 @@ namespace PolyArchitect.Worker {
 #endregion
         
         public async Task CreateBrush(string strSceneID) {
-            var sceneID = Guid.Parse(strSceneID);
+            var sceneID = int.Parse(strSceneID);
             var scene = core.Scenes.GetScene(sceneID);
             var cubeShape = ConvexPolyhedron.Construct(BrushBuilders.MakeRectangularCuboid(Vector3.UnitY, Vector3.UnitZ).Item1).Item1;
             var brush = new Brush(cubeShape, BooleanOperation.Add);
             var brushID = scene.MakeNode(brush);
-            await Clients.All.SendAsync("NodeCreated", sceneID, brushID);
+            await Clients.All.SendAsync("NodeCreated", strSceneID, brushID);
         }
         public async Task SetTransform(string strSceneID, int nodeID, float3 pos) {
             var transform = "placeholder";
