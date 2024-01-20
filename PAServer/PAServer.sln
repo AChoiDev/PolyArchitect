@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PACoreDebuggerGodot", "..\P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAEditor", "..\PAEditor\PAEditor.csproj", "{1D86CA1E-586B-455D-87B3-2241FC302ADB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PATransferDefinitions", "PATransferDefinitions\PATransferDefinitions.csproj", "{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,14 @@ Global
 		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.Release|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{1D86CA1E-586B-455D-87B3-2241FC302ADB}.Release|Any CPU.Build.0 = ExportRelease|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A55CB09-FCD0-44CC-90A1-27A07D6CFE69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

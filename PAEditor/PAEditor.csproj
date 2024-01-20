@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.2.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.2.0">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net7.0</TargetFramework>
@@ -13,6 +13,9 @@
     <Compile Remove="addons\gdUnit4\**" />
     <EmbeddedResource Remove="addons\gdUnit4\**" />
     <None Remove="addons\gdUnit4\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PAServer\PATransferDefinitions\PATransferDefinitions.csproj" />
   </ItemGroup>
 
 </Project>

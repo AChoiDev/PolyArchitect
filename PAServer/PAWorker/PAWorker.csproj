@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PACore\PACore.csproj" />
+    <ProjectReference Include="..\PATransferDefinitions\PATransferDefinitions.csproj" />
   </ItemGroup>
 
 </Project>

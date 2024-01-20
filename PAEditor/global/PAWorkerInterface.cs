@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
-
+using PolyArchitect.TransferDefinitions;
+using System.Text.Json;
 
 namespace PolyArchitect.Editor {
 
-	using float3 = (float x, float y, float z);
-	using float4 = (float w, float x, float y, float z);
 	using GDArray = Godot.Collections.Array;
 	using Request = (Task Task, string MethodName, Godot.Collections.Array Arguments);
 
@@ -25,6 +24,11 @@ namespace PolyArchitect.Editor {
 		private static Task startPAWorkerTask;
 
 		private readonly static Queue<Request> requests = [];
+
+		public static void StaticSubscribe<C>(string methodName, System.Action<C> listener) {
+			var handle = connection.On(methodName, listener);
+			StaticSubscriptions.Add(handle);
+		}
 
 		public override void _Ready()  {
 			startPAWorkerTask = StartPAWorker();
@@ -66,6 +70,7 @@ namespace PolyArchitect.Editor {
 			GD.Print($"PAWorker connected, listening on port: {port}");
 
 			StaticSubscriptions = BuildStaticSubscriptions();
+			SceneEditorState.RegisterSubscriptions();
 		}
         public override void _Process(double delta)
         {
@@ -167,6 +172,11 @@ namespace PolyArchitect.Editor {
 			}
 		}
 
+
+        public static string GetNodeDebugJson(string sceneID, int nodeID) {
+            var result = JsonSerializer.Serialize(SceneEditorState.Get<object>(sceneID, nodeID));
+            return result;
+        }
 	}
 
 }

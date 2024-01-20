@@ -107,6 +107,9 @@ func _on_command_line_edit_text_submitted(new_text: String) -> void:
 		_auto_scene_ID = command_components[1]
 	elif command_components[0] == "create_brush" and command_components.size() == 1:
 		_interface.Request("CreateBrush", [_auto_scene_ID])
+	elif command_components[0] == "print_node_json" and command_components.size() == 3:
+		var result = _interface.GetNodeDebugJson(String(command_components[1]), int(command_components[2]));
+		log_label.add_text(result + "\n");
 	else:
 		log_label.add_text("Command not found\n");
 
