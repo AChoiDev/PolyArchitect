@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using PolyArchitect.TransferDefinitions;
-using System.Text.Json;
+using System.Diagnostics;
 
 namespace PolyArchitect.Editor {
 
@@ -137,6 +137,12 @@ namespace PolyArchitect.Editor {
 					Message("Pong", msg);
 				}
 			),
+			connection.On<ProtoGlobalMeshUpdateState>(nameof(IWorkerClient.ProtoGlobalMeshUpdate), 
+				(update) => {
+					var meshState = ProtoGlobalMeshEditorState.FromUpdate(update);
+					Message("GlobalMeshUpdated", meshState.MakeGodotMesh());
+				}
+			),
 		];
 		
 		// general request method used by GDScript
@@ -173,10 +179,56 @@ namespace PolyArchitect.Editor {
 		}
 
 
-        public static string GetNodeDebugJson(string sceneID, int nodeID) {
-            var result = JsonSerializer.Serialize(SceneEditorState.Get<object>(sceneID, nodeID));
+        public static string GetNodeDebugTxt(string sceneID, int nodeID) {
+            var result = SceneEditorState.Get<object>(sceneID, nodeID).ToString();
             return result;
         }
+
+		public static void RunCmdList(string cmdListName) {
+			if (cmdListName == "apple") {
+				Task task = MakeTestSceneApple();
+			}
+		}
+
+		public static async Task MakeTestSceneApple() {
+			var stopWatch = new Stopwatch();
+			stopWatch.Start();
+
+			var sceneID = await connection.InvokeAsync<string>("CreateScene");
+			
+			// var brushID = brushCreatedState.BaseState.NodeID;
+			// await connection.InvokeAsync("ParentNode", sceneID, brushID, null, -1);
+			var transformLink = new PosRotScale(new float3(0, 0.3f, 0), new float4(1, 0, 0, 0), scale: new float3(1, 1, 1));
+			var transformOne = new PosRotScale(position: new(1, 0, 0), new float4(1, 0, 0, 0), scale: new(1, 3, 2));
+			var transformTwo = new PosRotScale(position: new(0.5f, 0, 0), new float4(1, 0, 0, 0), scale: new(1, 3, 1));
+			var transformThree = new PosRotScale(new float3(0, -0.1f, 0), new float4(1, 0, 0, 0), new float3(3, 2, 3));
+
+			var CSGLinkID = (await connection.InvokeAsync<CSGLinkUpdateState>("CreateCSGLink", sceneID)).NodeID;
+			await connection.InvokeAsync("SetCSGLinkOperation", sceneID, CSGLinkID, "add");
+			await connection.InvokeAsync("SetNodeLocalTransform", sceneID, CSGLinkID, transformLink);
+
+			var brushOneID = (await connection.InvokeAsync<BrushUpdateState>("CreateBrush", sceneID)).NodeID;
+            await Task.Delay(3000);
+			await connection.InvokeAsync("SetCSGLinkOperation", sceneID, brushOneID, "add");
+			await connection.InvokeAsync("SetNodeLocalTransform", sceneID, brushOneID, transformOne);
+			await connection.InvokeAsync("ParentNode", sceneID, brushOneID, CSGLinkID, -1);
+            await Task.Delay(3000);
+
+			var brushTwoID = (await connection.InvokeAsync<BrushUpdateState>("CreateBrush", sceneID)).NodeID;
+            await Task.Delay(3000);
+			await connection.InvokeAsync("SetNodeLocalTransform", sceneID, brushTwoID, transformTwo);
+			await connection.InvokeAsync("ParentNode", sceneID, brushTwoID, CSGLinkID, -1);
+            await Task.Delay(3000);
+			await connection.InvokeAsync("SetCSGLinkOperation", sceneID, brushTwoID, "subtract");
+            await Task.Delay(3000);
+
+			var brushThreeID = (await connection.InvokeAsync<BrushUpdateState>("CreateBrush", sceneID)).NodeID;
+			await connection.InvokeAsync("SetNodeLocalTransform", sceneID, brushThreeID, transformThree);
+            await Task.Delay(3000);
+			await connection.InvokeAsync("SetCSGLinkOperation", sceneID, brushThreeID, "intersect");
+
+			stopWatch.Stop();
+		}
 	}
 
 }

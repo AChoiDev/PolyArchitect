@@ -6,6 +6,7 @@ namespace PolyArchitect.TransferDefinitions {
         Task SceneAvailable(SceneID sceneID, bool availability);
         Task NodeUpdate(NodeUpdateState update);
         Task BrushUpdate(BrushUpdateState update);
+        Task CSGLinkUpdate(CSGLinkUpdateState update);
 
         // TODO: remove node created
         Task NodeCreated(SceneID sceneID, NodeID nodeID);
@@ -13,5 +14,6 @@ namespace PolyArchitect.TransferDefinitions {
         Task HierarchyUpdate(SceneID sceneID, string hierarchy);
         Task Destroyed(SceneID sceneID, NodeID nodeID);
         Task Pong(string connectionID);
+        Task ProtoGlobalMeshUpdate(ProtoGlobalMeshUpdateState update);
     }
 }

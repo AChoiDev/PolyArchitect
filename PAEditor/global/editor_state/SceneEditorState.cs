@@ -8,10 +8,19 @@ namespace PolyArchitect.Editor {
         public static Dictionary<(SceneID, NodeID), object> idToNodeState = [];
 
         public static void RegisterSubscriptions() {
+            // brush editor state subscriptions
             PAWorkerInterface.StaticSubscribe<BrushUpdateState>(
                 nameof(IWorkerClient.BrushUpdate), HandleDirectUpdate<BrushUpdateState, BrushEditorState>);
+            PAWorkerInterface.StaticSubscribe<CSGLinkUpdateState>(
+                nameof(IWorkerClient.NodeUpdate), HandleIndirectUpdate<CSGLinkUpdateState, BrushEditorState>);
             PAWorkerInterface.StaticSubscribe<NodeUpdateState>(
-                nameof(IWorkerClient.BrushUpdate), HandleIndirectUpdate<NodeUpdateState, BrushEditorState>);
+                nameof(IWorkerClient.NodeUpdate), HandleIndirectUpdate<NodeUpdateState, BrushEditorState>);
+
+            // csglink state subscriptions
+            PAWorkerInterface.StaticSubscribe<CSGLinkUpdateState>(
+                nameof(IWorkerClient.NodeUpdate), HandleDirectUpdate<CSGLinkUpdateState, CSGLinkEditorState>);
+            PAWorkerInterface.StaticSubscribe<NodeUpdateState>(
+                nameof(IWorkerClient.NodeUpdate), HandleIndirectUpdate<NodeUpdateState, CSGLinkEditorState>);
         }
 
         // Directly converts the update state into the editor state
@@ -19,8 +28,8 @@ namespace PolyArchitect.Editor {
             where C : INodeAddressable
             where E : class, IDirectUpdateListener<C, E> {
 
-            var stateKey = updateState.Address;
-            var transformedState = E.Update(updateState);
+            var stateKey = (updateState.SceneID, updateState.NodeID);
+            var transformedState = E.FromUpdate(updateState);
             if (idToNodeState.ContainsKey(stateKey)) {
                 idToNodeState[stateKey] = transformedState;
             } else {
@@ -33,11 +42,11 @@ namespace PolyArchitect.Editor {
             where C : INodeAddressable
             where E : class, IIndirectUpdateListener<C, E> {
 
-            var stateKey = updateState.Address;
+            var stateKey = (updateState.SceneID, updateState.NodeID);
 
             if (idToNodeState.ContainsKey(stateKey) && idToNodeState[stateKey] is E) {
                 var currentState = (E)idToNodeState[stateKey];
-                idToNodeState[stateKey] = currentState.Update(updateState);
+                idToNodeState[stateKey] = currentState.WithUpdate(updateState);
             }
         }
 

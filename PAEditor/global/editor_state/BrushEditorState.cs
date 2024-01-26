@@ -1,22 +1,25 @@
 using PolyArchitect.TransferDefinitions;
 using Godot;
 namespace PolyArchitect.Editor {
-    public class BrushEditorState(NodeEditorState baseState, int faceCount) 
-        : IIndirectUpdateListener<NodeUpdateState, BrushEditorState>,
-        IDirectUpdateListener<BrushUpdateState, BrushEditorState> {
+    public record BrushEditorState(CSGLinkEditorState LinkState, int FaceCount) 
+        : CSGLinkEditorState(LinkState),
+        IIndirectUpdateListener<NodeUpdateState, BrushEditorState>,
+        IDirectUpdateListener<BrushUpdateState, BrushEditorState>,
+        IIndirectUpdateListener<CSGLinkUpdateState, BrushEditorState> {
 
-        public int FaceCount => faceCount;
-        public NodeEditorState BaseState => baseState;
+        public static BrushEditorState FromUpdate(BrushUpdateState update) {
+            return new(
+                LinkState: FromUpdate(update.LinkState),
+                FaceCount: update.FaceCount
+            );
+        }
 
-        // Listener implementations
-        public static BrushEditorState Update(BrushUpdateState update) => new(
-            baseState: NodeEditorState.Update(update.BaseState),
-            faceCount: update.FaceCount
-        );
+        public new BrushEditorState WithUpdate(NodeUpdateState update) {
+            return this with {LinkState = base.WithUpdate(update)};
+        }
 
-        public BrushEditorState Update(NodeUpdateState update) {
-            baseState = NodeEditorState.Update(update);
-            return this;
+        public BrushEditorState WithUpdate(CSGLinkUpdateState update) {
+            return this with {CSGOperation = update.Operation};
         }
     }
 }

@@ -18,7 +18,7 @@ namespace PolyArchitect.Core {
         public AxisAlignedBoundingBox AABB(Matrix4x4 worldTransform)
             => new (Polyhedron.GetTransformedVertices(worldTransform));
 
-        public readonly BooleanOperation operation;
+        public BooleanOperation operation;
 
         public Brush(ConvexPolyhedron polyhedron, BooleanOperation operation) {
             this.operation = operation;
