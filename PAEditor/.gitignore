@@ -3,3 +3,6 @@
 
 # VSCode specific ignores
 .vscode/
+
+# C# specific ignores
+PAEditor.csproj.old

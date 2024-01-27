@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://dvb2bjc56skgc"]
+[gd_scene load_steps=8 format=3 uid="uid://dvb2bjc56skgc"]
 
 [ext_resource type="PackedScene" uid="uid://cuedaakgiimhj" path="res://ui/menu_bar/menu_bar.tscn" id="1_dttc1"]
 [ext_resource type="Script" path="res://ui/editor/editor.gd" id="1_e2enh"]
 [ext_resource type="PackedScene" uid="uid://dcemjvg3khhqj" path="res://ui/world/world.tscn" id="3_sgi2y"]
 [ext_resource type="Script" path="res://ui/editor/viewport.gd" id="3_xeuag"]
 [ext_resource type="PackedScene" uid="uid://nujj30ai6tql" path="res://ui/console/console.tscn" id="4_y5nfr"]
+[ext_resource type="PackedScene" uid="uid://c432175djpv8y" path="res://ui/scene_tree_view/scene_tree_view.tscn" id="6_60uqu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl0ke"]
 content_margin_left = 6.0
@@ -91,11 +92,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 
-[node name="Panel" type="Panel" parent="CenterMargin/Center/Right"]
+[node name="SceneTreeView" parent="CenterMargin/Center/Right" instance=ExtResource("6_60uqu")]
 layout_mode = 2
-size_flags_vertical = 3
 
-[node name="Panel2" type="Panel" parent="CenterMargin/Center/Right"]
+[node name="Panel" type="Panel" parent="CenterMargin/Center/Right"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.75

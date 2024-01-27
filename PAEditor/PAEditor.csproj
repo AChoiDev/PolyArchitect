@@ -1,4 +1,4 @@
-﻿<Project Sdk="Godot.NET.Sdk/4.2.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.2.1">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net7.0</TargetFramework>
@@ -17,5 +17,4 @@
   <ItemGroup>
     <ProjectReference Include="..\PAServer\PATransferDefinitions\PATransferDefinitions.csproj" />
   </ItemGroup>
-
 </Project>
